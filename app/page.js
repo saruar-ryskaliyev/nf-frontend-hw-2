@@ -5,19 +5,26 @@ import TaskList from './components/TaskList';
 /* eslint-disable react/no-unescaped-entities */
 
 export default function Home() {
-  const [tasks, setTasks] = useState(() => {
-    return JSON.parse(localStorage.getItem('tasks')) || [];
-  });
-
+  const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState('all');
   const [newTaskText, setNewTaskText] = useState('');
-
-
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    console.log(localStorage.getItem('tasks'));
-  }, [tasks]);
+    if (typeof window !== 'undefined') {
+      const storedTasks = localStorage.getItem('tasks');
+      if (storedTasks) {
+        setTasks(JSON.parse(storedTasks));
+      }
+      setIsMounted(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+  }, [tasks, isMounted]);
 
   const handleAddTask = () => {
     if (newTaskText.trim()) {
